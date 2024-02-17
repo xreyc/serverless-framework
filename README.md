@@ -1,72 +1,57 @@
-<!--
-title: 'AWS NodeJS Example'
-description: 'This template demonstrates how to deploy a NodeJS function running on AWS Lambda using the traditional Serverless Framework.'
-layout: Doc
-framework: v3
-platform: AWS
-language: nodeJS
-priority: 1
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Serverless Framework AWS NodeJS
 
+This is a backend application based on serverless framework.
+The purpose of this project is to design event driven architecture
 
-# Serverless Framework AWS NodeJS Example
+## Specification
 
-This template demonstrates how to deploy a NodeJS function running on AWS Lambda using the traditional Serverless Framework. The deployed function does not include any event definitions as well as any kind of persistence (database). For more advanced configurations check out the [examples repo](https://github.com/serverless/examples/) which includes integrations with SQS, DynamoDB or examples of functions that are triggered in `cron`-like manner. For details about configuration of specific `events`, please refer to our [documentation](https://www.serverless.com/framework/docs/providers/aws/events/).
+### Infrastructure Architecture
+                                    ---> DynamoDB               ---> Topic 1 ---> SQS ---> Lambda ---> S3
+Client ---> API Gateway ---> Lambda ---> S3 --------------> SNS ---> Topic 2
+                                    ---> API Logs               ---> Topic 3
 
-## Usage
+### Technologies
 
-### Deployment
+| Topic                            | Technology    |
+| -------------------------------- | ------------- |
+| Framework                        | Serverless    |
+| Authentication and Authorization | Cognito       |
+| Authentication and Authorization | Lambda        |
+| Database                         | Lambda        |
+| Storage                          | S3            |
+| Notification                     | SNS           |
+| Queuing                          | SQS           |
 
-In order to deploy the example, you need to run the following command:
+## Deployments
 
-```
-$ serverless deploy
-```
+### Environments
 
-After running deploy, you should see output similar to:
+| Environments   |
+| -------------- |
+| dev            |
+| test           |
+| production     |
 
-```bash
-Deploying aws-node-project to stage dev (us-east-1)
+### Database
 
-✔ Service deployed to stack aws-node-project-dev (112s)
-
-functions:
-  hello: aws-node-project-dev-hello (1.5 kB)
-```
-
-### Invocation
-
-After successful deployment, you can invoke the deployed function by using the following command:
-
-```bash
-serverless invoke --function hello
-```
-
-Which should result in response similar to the following:
-
-```json
-{
-    "statusCode": 200,
-    "body": "{\n  \"message\": \"Go Serverless v3.0! Your function executed successfully!\",\n  \"input\": {}\n}"
-}
-```
-
-### Local development
-
-You can invoke your function locally by using the following command:
-
-```bash
-serverless invoke local --function hello
-```
-
-Which should result in response similar to the following:
+First navigate to app/infrastructure/cognito
 
 ```
-{
-    "statusCode": 200,
-    "body": "{\n  \"message\": \"Go Serverless v3.0! Your function executed successfully!\",\n  \"input\": \"\"\n}"
-}
+$ serverless deploy -s <environment>
+```
+
+### Storage
+
+First navigate to app/infrastructure/storage
+
+```
+$ serverless deploy -s <environment>
+```
+
+### API
+
+First navigate to app/api
+
+```
+$ serverless deploy -s <environment>
 ```
