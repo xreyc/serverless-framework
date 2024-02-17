@@ -1,0 +1,21 @@
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  resourcesRegion: ap-southeast-1
+  projectName: reycoapp
+  resourcesStages:
+    dev: dev
+    uat: uat
+    prod: prod
+  resourcesStage: ${self:custom.resourcesStages.${self:custom.common.stage}, self:custom.common.resourcesStages.dev}
+  memSize:
+    dev: 128
+    uat: 128
+    prod: 256
+  artifactBucket: ${self:custom.common.projectName}-${self:custom.common.stage}-deploy-layers
+
+lambdaPolicyXRay:
+  Effect: Allow
+  Action:
+    - xray:PutTraceSegments
+    - xray:PutTelemetryRecords
+  Resource: "*"

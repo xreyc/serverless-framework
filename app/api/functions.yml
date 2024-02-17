@@ -1,0 +1,56 @@
+# Test 1
+test1Get:
+  handler: src/handlers/test/testHandler.getTest
+  events:
+    - http:
+        path: test/getTest
+        method: GET
+test1Create:
+  handler: src/handlers/test/testHandler.createTest
+  events:
+    - http:
+        path: test/createTest
+        method: POST
+        cors: true
+
+# Lambda authorizer
+lambdaAuthorizer:
+  handler: src/services/auth/lambdaAuthorizer.authorize
+
+# Lambda authorizer protected route
+lambdaAuthorizerProtectedResource:
+  handler: src/handlers/test/testHandler.getTest
+  events:
+    - http:
+        path: lambda/protected/getTest
+        method: GET
+        authorizer: lambdaAuthorizer
+
+# Cognito login
+cognitoAuthorizerLoginResource:
+  handler: src/handlers/auth/authHandler.loginUser
+  events:
+    - http:
+        path: cognito/login
+        method: POST
+        cors: true
+
+# Cognito register
+cognitoAuthorizerRegisterResource:
+  handler: src/handlers/auth/authHandler.registerUser
+  events:
+    - http:
+        path: cognito/register
+        method: POST
+        cors: true
+
+# Cognito authorizer protected route
+cognitoAuthorizerProtectedResource:
+  handler: src/handlers/test/testHandler.getTest
+  events:
+    - http:
+        path: cognito/protected/getTest
+        method: GET
+        cors: true
+        authorizer:
+          arn: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppCognitoUserPoolArn}

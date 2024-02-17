@@ -1,0 +1,37 @@
+app: reyc-app-api
+service: reyc-app-api
+frameworkVersion: '3'
+
+# Provider
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${self:custom.common.resourcesRegion}
+  stage: dev
+  logRetentionInDays: 7
+  lambdaHashingVersion: 20201221
+  versionFunctions: false
+  memorySize: ${self:custom.common.memSize.${self:custom.common.stage}}
+  environment:
+    # COGNITO ENVIRONMENT VARIABLES
+    COGNITO_USER_POOL_ID: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppUserPoolId}
+    COGNITO_USER_POOL_ARN: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppCognitoUserPoolArn}
+    COGNITO_CLIENT_ID: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppPoolClientId}
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "cognito-idp:AdminConfirmSignUp"
+            - "cognito-idp:ListUsers"
+            - "cognito-idp:InitiateAuth"
+            - "cognito-idp:RespondToAuthChallenge"
+            - "cognito-idp:AdminInitiateAuth"
+            - "cognito-idp:AdminCreateUser"
+            - "cognito-idp:AdminSetUserPassword"
+          Resource: "*"
+
+functions: ${file(./functions.yml)}
+
+custom:
+  common: ${file(../../serverless.common.yml):custom}

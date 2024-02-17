@@ -1,0 +1,143 @@
+app: reyc-app-cognito
+service: reyc-app-cognito
+frameworkVersion: '3'
+
+# Provider
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${self:custom.common.resourcesRegion}
+  stage: dev
+  logRetentionInDays: 7
+  lambdaHashingVersion: 20201221
+  versionFunctions: false
+  memorySize: ${self:custom.common.memSize.${self:custom.common.stage}}
+
+# Custom Variables
+custom:
+  common: ${file(../../../serverless.common.yml):custom}
+
+# Resources
+resources:
+  Resources:
+    ############## COGNITO ##############
+    # Cognito User Pool
+    # - this is the user pool for our cognito
+    ReycAppCognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:service}-${self:provider.stage}
+        Schema:
+          - Name: email
+            Required: true
+            Mutable: true
+            StringAttributeConstraints:
+              MaxLength: 100
+          - Name: preferred_username
+            AttributeDataType: String
+            Mutable: true
+            Required: false
+            StringAttributeConstraints:
+              MaxLength: 100
+          - Name: phone_number
+            AttributeDataType: String
+            Mutable: true
+            Required: false
+            NumberAttributeConstraints:
+              MinValue: 20
+          - Name: family_name
+            AttributeDataType: String
+            Mutable: true
+            Required: false
+            StringAttributeConstraints:
+              MaxLength: 50
+          - Name: given_name
+            AttributeDataType: String
+            Mutable: true
+            Required: false
+            StringAttributeConstraints:
+              MaxLength: 50
+          - Name: updated_at
+            AttributeDataType: Number
+            Mutable: true
+            Required: false
+            NumberAttributeConstraints:
+              MinValue: 0
+          - Name: created_at
+            AttributeDataType: Number
+            Mutable: false
+            Required: false
+            NumberAttributeConstraints:
+              MinValue: 0
+          - Name: user_type
+            AttributeDataType: String
+            Mutable: true
+            Required: false
+            StringAttributeConstraints:
+              MaxLength: 50
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+            RequireUppercase: true
+        AutoVerifiedAttributes: ["email"]
+    # Cognito User Pool Client
+    # - represents the application that is allowed to make request to the
+    # - cognito user pool
+    ReycAppCognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: ${self:service}-${self:provider.stage}-ReycExternalApp
+        UserPoolId:
+          Ref: ReycAppCognitoUserPool
+        GenerateSecret: false
+        AccessTokenValidity: 5
+        IdTokenValidity: 5
+        ExplicitAuthFlows:
+          - ADMIN_NO_SRP_AUTH
+        ReadAttributes:
+          - preferred_username
+          - email
+          - phone_number
+          - family_name
+          - given_name
+          - updated_at
+          - custom:created_at
+          - custom:user_type
+        WriteAttributes:
+          - preferred_username
+          - email
+          - phone_number
+          - family_name
+          - given_name
+          - updated_at
+          - custom:created_at
+          - custom:user_type
+
+    # Hosted UI customization is done manually on aws
+
+  # Outputs
+  # - this exposes parts of the stack to other serverless or app
+  Outputs:
+    # Cognito Pool Id
+    ReycAppUserPoolId:
+      Value: !Ref ReycAppCognitoUserPool
+
+    # # Cognito User Pool Client Id
+    ReycAppPoolClientId:
+      Value: !Ref ReycAppCognitoUserPoolClient
+
+    # Cognito ARN
+    ReycAppCognitoUserPoolArn:
+      # the value gets the ARN from ReycAppCognitoUserPool
+      # you can use: !GetAtt ReycAppCognitoUserPool.Arn as shortcut
+      Value:
+        Fn::GetAtt:
+          - ReycAppCognitoUserPool
+          - Arn
+      # these is the export name that will be used to reference by other stack
+      # use this only if you want to specific naming for the export name
+      Export:
+        Name: ${self:service}-${self:provider.stage}
