@@ -10,6 +10,15 @@ The purpose of this project is to design event driven architecture
 Client ---> API Gateway ---> Lambda ---> S3 --------------> SNS ---> Topic 2
                                     ---> API Logs               ---> Topic 3
 
+
+```mermaid
+graph TD;
+    Client-->Api Gateway;
+    Api Gateway-->Lambda API Handlers;
+    Lambda API Handlers-->DynamoDB;
+    Lambda API Handlers-->DynamoDB;
+```
+
 ### Technologies
 
 | Topic                            | Technology    |
