@@ -5,7 +5,7 @@ The purpose of this project is to design event driven architecture
 
 ## Specification
 
-### Infrastructure Architecture
+### Infrastructure Architecture (Event Driven Architecture)
 
 ```mermaid
 graph TD;
