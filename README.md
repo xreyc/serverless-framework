@@ -6,17 +6,22 @@ The purpose of this project is to design event driven architecture
 ## Specification
 
 ### Infrastructure Architecture
-                                    ---> DynamoDB               ---> Topic 1 ---> SQS ---> Lambda ---> S3
-Client ---> API Gateway ---> Lambda ---> S3 --------------> SNS ---> Topic 2
-                                    ---> API Logs               ---> Topic 3
-
 
 ```mermaid
 graph TD;
     Client-->ApiGateway;
     ApiGateway-->LambdaAPIHandlers;
     LambdaAPIHandlers-->DynamoDB;
-    LambdaAPIHandlers-->DynamoDB;
+    LambdaAPIHandlers-->S3;
+    LambdaAPIHandlers-->ApiLogs;
+    S3-->SNS;
+    SNS-->Topic1;
+    SNS-->Topic2;
+    SNS-->Topic3;
+    Topic1-->SQS;
+    SQS-->LambdaBackgroudProcess;
+    LambdaBackgroudProcess-->S3;
+    LambdaBackgroudProcess-->DynamoDBDataWarehouse;
 ```
 
 ### Technologies
