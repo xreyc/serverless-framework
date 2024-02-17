@@ -23,7 +23,7 @@ graph TD;
     SQS-->LambdaBackgroudProcess;
     LambdaBackgroudProcess-->S3Bucket3;
     LambdaBackgroudProcess-->DynamoDBDataWarehouse;
-    Topic2-->SQS;
+    Topic2-->SQS2;
     SQS2-->LambdaBackgroudProcess2;
     LambdaBackgroudProcess2-->S3Bucket4;
     LambdaBackgroudProcess2-->DynamoDBDataWarehouse;
