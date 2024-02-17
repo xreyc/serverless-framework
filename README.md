@@ -12,15 +12,15 @@ graph TD;
     Client-->ApiGateway;
     ApiGateway-->LambdaAPIHandlers;
     LambdaAPIHandlers-->DynamoDB;
-    LambdaAPIHandlers-->S3;
+    LambdaAPIHandlers-->S3Bucket1;
     LambdaAPIHandlers-->ApiLogs;
-    S3-->SNS;
+    S3Bucket1-->SNS;
     SNS-->Topic1;
     SNS-->Topic2;
     SNS-->Topic3;
     Topic1-->SQS;
     SQS-->LambdaBackgroudProcess;
-    LambdaBackgroudProcess-->S3;
+    LambdaBackgroudProcess-->S3Bucket2;
     LambdaBackgroudProcess-->DynamoDBDataWarehouse;
 ```
 
