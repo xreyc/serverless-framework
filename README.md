@@ -24,13 +24,13 @@ graph TD;
     LambdaBackgroudProcess-->DynamoDBDataWarehouse;
     Topic2-->SQS2;
     SQS2-->LambdaBackgroudProcess2;
-    LambdaBackgroudProcess2-->S3Bucket4;
     LambdaBackgroudProcess2-->DynamoDBDataWarehouse;
     S3Bucket2-->SNS2;
     SNS2-->Topic3;
     Topic3-->SQS3;
     SQS3-->LambdaBackgroudProcess3;
     LambdaBackgroudProcess3-->DynamoDBDataWarehouse;
+    LambdaBackgroudProcess3-->S3Bucket4;
 ```
 
 ### Technologies
