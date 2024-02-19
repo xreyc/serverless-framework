@@ -17,9 +17,12 @@ provider:
     COGNITO_USER_POOL_ID: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppUserPoolId}
     COGNITO_USER_POOL_ARN: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppCognitoUserPoolArn}
     COGNITO_CLIENT_ID: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppPoolClientId}
+    # S3 ENVIRONMENT VARIABLES
+    S3_UPLOAD_BUCKET_1: ${cf:reyc-app-storage-${self:custom.common.stage}.ReycAppS3BucketName}
   iam:
     role:
       statements:
+        # COGNITO PERMISSIONS
         - Effect: "Allow"
           Action:
             - "cognito-idp:AdminConfirmSignUp"
@@ -30,8 +33,16 @@ provider:
             - "cognito-idp:AdminCreateUser"
             - "cognito-idp:AdminSetUserPassword"
           Resource: "*"
+        # S3 PERMISSIONS
+        - Effect: "Allow"
+          Action:
+            - "s3:*"
+          Resource: "*"
 
-functions: ${file(./functions.yml)}
+functions:
+  - ${file(./functions-test.yml)}
+  - ${file(./functions-auth.yml)}
+  - ${file(./functions-storage.yml)}
 
 custom:
   common: ${file(../../serverless.common.yml):custom}

@@ -1,18 +1,3 @@
-# Test 1
-test1Get:
-  handler: src/handlers/test/testHandler.getTest
-  events:
-    - http:
-        path: test/getTest
-        method: GET
-test1Create:
-  handler: src/handlers/test/testHandler.createTest
-  events:
-    - http:
-        path: test/createTest
-        method: POST
-        cors: true
-
 # Lambda authorizer
 lambdaAuthorizer:
   handler: src/services/auth/lambdaAuthorizer.authorize

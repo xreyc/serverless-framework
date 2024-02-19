@@ -1,0 +1,26 @@
+# Storage Upload File1 - Base64 encoded
+storageUploadFile1:
+  handler: src/handlers/storage/storageHandler.uploadFile1
+  events:
+    - http:
+        path: storage/upload_file1
+        method: POST
+        cors: true
+
+# Storage Upload File1 - Multipart
+storageUploadFile2:
+  handler: src/handlers/storage/storageHandler.uploadFile2
+  events:
+    - http:
+        path: storage/upload_file2
+        method: POST
+        cors: true
+
+# Storage Get File
+storageGetFile:
+  handler: src/handlers/storage/storageHandler.getFile
+  events:
+    - http:
+        path: storage/get_file
+        method: GET
+        cors: true
