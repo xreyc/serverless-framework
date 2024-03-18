@@ -18,7 +18,7 @@ provider:
     COGNITO_USER_POOL_ARN: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppCognitoUserPoolArn}
     COGNITO_CLIENT_ID: ${cf:reyc-app-cognito-${self:custom.common.stage}.ReycAppPoolClientId}
     # S3 ENVIRONMENT VARIABLES
-    S3_UPLOAD_BUCKET_1: ${cf:reyc-app-storage-${self:custom.common.stage}.ReycAppS3BucketName}
+    S3_UPLOAD_BUCKET_1: ${cf:reyc-app-bgprocess-${self:custom.common.stage}.ReycAppS3BucketName}
   iam:
     role:
       statements:
@@ -43,6 +43,7 @@ functions:
   - ${file(./functions-test.yml)}
   - ${file(./functions-auth.yml)}
   - ${file(./functions-storage.yml)}
+  - ${file(./functions-bgprocess.yml)}
 
 custom:
   common: ${file(../../serverless.common.yml):custom}

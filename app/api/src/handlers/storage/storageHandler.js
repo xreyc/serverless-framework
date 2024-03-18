@@ -16,7 +16,7 @@ exports.uploadFile1 = async (event, context, callback) => {
         /** Upload to S3 */
         const params = {
             Bucket: process.env.S3_UPLOAD_BUCKET_1,
-            Key: `uploads/${Date.now()}_uploadfile1.txt`,
+            Key: `${Date.now()}_uploadfile1.txt`,
             Body: decodedFile,
             ContentType: 'text/plain',
         }

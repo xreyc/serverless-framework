@@ -26,7 +26,7 @@ resources:
     ReycAppCognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: ${self:service}-${self:provider.stage}
+        UserPoolName: ${self:service}-${self:custom.common.stage}
         Schema:
           - Name: email
             Required: true
@@ -89,7 +89,7 @@ resources:
     ReycAppCognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: ${self:service}-${self:provider.stage}-ReycExternalApp
+        ClientName: ${self:service}-${self:custom.common.stage}-ReycExternalApp
         UserPoolId:
           Ref: ReycAppCognitoUserPool
         GenerateSecret: false
@@ -140,4 +140,4 @@ resources:
       # these is the export name that will be used to reference by other stack
       # use this only if you want to specific naming for the export name
       Export:
-        Name: ${self:service}-${self:provider.stage}
+        Name: ${self:service}-${self:custom.common.stage}

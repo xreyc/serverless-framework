@@ -1,0 +1,153 @@
+app: bgprocess
+service: bgprocess
+frameworkVersion: '3'
+
+# Provider
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${self:custom.common.resourcesRegion}
+  stage: dev
+  logRetentionInDays: 7
+  lambdaHashingVersion: 20201221
+  versionFunctions: false
+  memorySize: ${self:custom.common.memSize.${self:custom.common.stage}}
+
+# Custom Variables
+custom:
+  common: ${file(../../../serverless.common.yml):custom}
+
+# RESOURCES
+resources:
+  Resources:
+    ############################### S3 Bucket ###############################
+    ReycAppS3Bucket:
+      Type: AWS::S3::Bucket
+      DependsOn:
+        - ReycAppS3SNSTopicPolicy
+      Properties:
+        BucketName: ${self:service}-${self:custom.common.stage}-u1
+        # S3 to SNS Configuration
+        NotificationConfiguration:
+          TopicConfigurations:
+            - Event: s3:ObjectCreated:Put
+              Topic: !Ref ReycAppSNSTopic1
+    # Bucket 2
+    ReycAppS3Bucket2:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:custom.common.stage}-u2
+
+
+    ############################### SNS Topics ###############################
+    ReycAppSNSTopic1:
+      Type: AWS::SNS::Topic
+      # DependsOn - makes sure that the dependencies are create or updated first
+      DependsOn:
+        - ReycAppSQSQueue1
+      Properties:
+        TopicName: ${self:service}-${self:custom.common.stage}-tp1
+        # List of sqs subscribed to this sns
+        Subscription:
+          - Endpoint:
+              Fn::GetAtt:
+                - ReycAppSQSQueue1
+                - Arn
+            Protocol: sqs
+
+    # SNS Policy - S3 Triggered
+    ReycAppS3SNSTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        Topics:
+          - !Ref ReycAppSNSTopic1
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - sns.amazonaws.com
+              Action:
+                - "sns:Publish"
+              Resource: !Ref ReycAppSNSTopic1
+              Condition:
+                # Here we are using hardcoded arn
+                ArnLike:
+                  aws:SourceArn: arn:aws:s3:::${self:service}-${self:custom.common.stage}-u1
+
+    ############################### SQS Queues ###############################
+    # SQS Queues
+    ReycAppSQSQueue1:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service}-${self:custom.common.stage}-q1
+    # SQS Policy
+    ReycAppSQSQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      # DependsOn - makes sure that the dependencies are create or updated first
+      DependsOn:
+        - ReycAppSQSQueue1
+      Properties:
+        Queues:
+          - Ref: ReycAppSQSQueue1
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - "events.amazonaws.com"
+                  - "sqs.amazonaws.com"
+                  - "sns.amazonaws.com"
+              Action:
+                - "sns:Publish"
+                - "sqs:SendMessage"
+                - "sqs:ReceiveMessage"
+              Resource:
+                Fn::GetAtt:
+                  - ReycAppSQSQueue1
+                  - Arn
+              Condition:
+                ArnEquals:
+                  aws:SourceArn:
+                    Ref: ReycAppSNSTopic1
+
+  ############################### Outputs ###############################
+  Outputs:
+    # S3 Outputs
+    ReycAppS3BucketName:
+      Value: !Ref ReycAppS3Bucket
+      Export:
+        Name: ${self:service}-${self:custom.common.stage}-u1
+    ReycAppS3BucketNameArn:
+      Value:
+        Fn::GetAtt:
+          - ReycAppS3Bucket
+          - Arn
+      Export:
+        Name: ${self:service}-${self:custom.common.stage}-u1arn
+    ReycAppS3BucketName2:
+      Value: !Ref ReycAppS3Bucket2
+      Export:
+        Name: ${self:service}-${self:custom.common.stage}-u2
+    ReycAppS3BucketName2Arn:
+      Value:
+        Fn::GetAtt:
+          - ReycAppS3Bucket2
+          - Arn
+      Export:
+        Name: ${self:service}-${self:custom.common.stage}-u2arn
+    # SNS Outputs
+    ReycAppSNSTopic1:
+      Value: !Ref ReycAppSNSTopic1
+      Export:
+        Name: ${self:service}-${self:custom.common.stage}-tp1
+    # SQS Outputs
+    ReycAppSQSQueue1Arn:
+      Value:
+        Fn::GetAtt:
+          - ReycAppSQSQueue1
+          - Arn
+      Export:
+        Name: ${self:service}-${self:custom.common.stage}-q1

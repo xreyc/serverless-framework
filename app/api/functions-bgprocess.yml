@@ -1,0 +1,5 @@
+sqsQueue1:
+  handler: src/handlers/bgprocess/sqsHandler.sqsQueue1Handler
+  events:
+    - sqs:
+        arn: ${cf:reyc-app-bgprocess-${self:custom.common.stage}.ReycAppSQSQueue1Arn}
